@@ -13,15 +13,17 @@ router.get("/",async function (req, res, next) {
 });
 
 router.post("/", async function (req, res, next) {
-  const token = await db.addVacation(req.body);
+  console.log("gooooooooooooooooooooo");
+  
+  const token = await db.addVacation(req.body.edited);
   res.cookie("token", token);
   res.send();
 });
 
 router.put("/:id", async function (req, res, next) {
   console.log('puuuuuuuuuuuuuuuuuuuuuuuuuuuuuut');
-  
-  res.send(await db.editVacation(req.params.id, req.body));
+  const response = await db.editVacation(req.params.id, req.body.edited)
+  res.send(await db.editVacation(req.params.id, req.body.edited));
 });
 
 router.delete("/:id", async function (req, res, next) {

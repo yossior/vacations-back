@@ -60,7 +60,7 @@ module.exports = {
         .then(hash => {
           const insertCMD = `INSERT INTO users (username, firstName, lastName, password, token, isAdmin) VALUES ('${
             user.user
-          }','${user.firstName}','${user.lastName}','${hash}', '${unique}', ${user.isAdmin ? "b'1'" : "b'0'"})`;
+            }','${user.firstName}','${user.lastName}','${hash}', '${unique}', ${user.isAdmin ? "b'1'" : "b'0'"})`;
           return pool.query(insertCMD);
         })
         .then(resolve(unique))
@@ -74,22 +74,26 @@ module.exports = {
     const insertCMD = `INSERT INTO vacations (description, location, picture, price, startDate, endDate) VALUES (
       '${vacation.description}','${vacation.location}','${vacation.picture}',${
       vacation.price
-    },'${vacation.startDate}','${vacation.endDate}')`;
+      },'${vacation.startDate}','${vacation.endDate}')`;
     return new Promise((resolve, reject) => {
       pool
         .query(insertCMD)
-        .then(resolve())
-        .catch(err => reject(err));
+        .then((results) => {
+          console.log(results);
+          
+          resolve(results)})
+        .catch(err => console.log(err)
+        );
     });
   },
   editVacation: (id, vacation) => {
     const editCMD = `UPDATE vacations SET description = '${
       vacation.description
-    }', location = '${vacation.location}', picture = '${
+      }', location = '${vacation.location}', picture = '${
       vacation.picture
-    }', price = '${vacation.price}', startDate = '${
+      }', price = '${vacation.price}', startDate = '${
       vacation.startDate
-    }', endDate = '${vacation.endDate}' WHERE id = ${id}`;
+      }', endDate = '${vacation.endDate}' WHERE id = ${id}`;
     return new Promise((resolve, reject) => {
       pool
         .query(editCMD)
@@ -110,14 +114,14 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const getPassCMD = `SELECT password, token FROM users WHERE username = '${
         user.user
-      }'`;
+        }'`;
       pool.query(getPassCMD).then(results => {
         if (results.length > 0)
           bcrypt.compare(user.password, results[0].password, (err, same) => {
             if (err) throw err;
-            same ? resolve(results[0].token) : reject("bad");
+            same ? resolve(results[0].token) : reject("bad1");
           });
-        else reject("bad");
+        else reject("bad2");
       });
     });
   },
@@ -125,14 +129,14 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const getPassCMD = `SELECT password, isAdmin, token FROM users WHERE username = '${
         admin.user
-      }'`;
+        }'`;
       pool.query(getPassCMD).then(results =>
         bcrypt.compare(admin.password, results[0].password, (err, same) => {
           if (err) throw err;
           if (same)
             if (results[0].isAdmin === 1) resolve(results[0].token);
-            else reject("bad");
-          else reject("bad");
+            else reject("bad3");
+          else reject("bad4");
         })
       );
     });

@@ -30,9 +30,9 @@ module.exports = {
             if (results.length > 0)
               bcrypt.compare(user.password, results[0].password, (err, same) => {
                 if (err) throw err;
-                same ? resolve(results[0].token) : reject("bad");
+                same ? resolve(results[0].token) : reject("bad5");
               });
-            else reject("bad");
+            else reject("bad6");
           });
         });
       },
@@ -46,8 +46,8 @@ module.exports = {
               if (err) throw err;
               if (same)
                 if (results[0].isAdmin === 1) resolve(results[0].token);
-                else reject("bad");
-              else reject("bad");
+                else reject("bad7");
+              else reject("bad8");
             })
           );
         });

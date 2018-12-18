@@ -14,20 +14,22 @@ router.get("/",async function (req, res, next) {
 
 router.post("/", async function (req, res, next) {
   console.log("gooooooooooooooooooooo");
-  
   const token = await db.addVacation(req.body.edited);
   res.cookie("token", token);
+  emitVacs();
   res.send();
 });
 
 router.put("/:id", async function (req, res, next) {
   console.log('puuuuuuuuuuuuuuuuuuuuuuuuuuuuuut');
-  const response = await db.editVacation(req.params.id, req.body.edited)
+  // const response = await db.editVacation(req.params.id, req.body.edited);
   res.send(await db.editVacation(req.params.id, req.body.edited));
+  emitVacs();
 });
 
 router.delete("/:id", async function (req, res, next) {
   res.send(await db.deleteVacation(req.params.id));
+  emitVacs();
 });
 
 module.exports = router;

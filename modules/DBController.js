@@ -11,13 +11,20 @@ const firstConnection = mysql.createConnection({
   user: "root",
   password: "root"
 });
+
 const adminUser = {
   user: 'Admin',
   firstName: 'Admin',
   lastName: 'Admin',
   password: 'Admin',
   isAdmin: true
-}
+};
+
+const io = require('socket.io')();
+async function emitVacs() {
+  io.emit('VACS_UPDATE', await db.getAllVacations())
+};
+
 
 module.exports = {
   createDB() {
@@ -42,9 +49,18 @@ module.exports = {
                 endDate DATE NULL,
                 followers INT NOT NULL DEFAULT 0,
                 PRIMARY KEY (id))`;
+    const followers = `CREATE TABLE IF NOT EXISTS followers (
+                  id INT NOT NULL AUTO_INCREMENT,
+                  vacationID INT NOT NULL,
+                  userID INT NOT NULL,
+                  PRIMARY KEY (id));
+                `;
     firstConnection.then(conn => conn.query(dbCMD))
       .then(results => {
         if (typeof results !== 'undefined' && results.warningCount === 0) return pool.query(vacationsCMD)
+      })
+      .then(results => {
+        if (typeof results !== 'undefined' && results.warningCount === 0) return pool.query(followers)
       })
       .then(results => {
         if (typeof results !== 'undefined' && results.warningCount === 0) return pool.query(usersCMD)
@@ -59,13 +75,16 @@ module.exports = {
       bcrypt.hash(user.password, saltRounds)
         .then(hash => {
           const insertCMD = `INSERT INTO users (username, firstName, lastName, password, token, isAdmin) VALUES ('${
-            user.user
+            user.username
             }','${user.firstName}','${user.lastName}','${hash}', '${unique}', ${user.isAdmin ? "b'1'" : "b'0'"})`;
           return pool.query(insertCMD);
         })
-        .then(resolve(unique))
+        .then(() => {
+          resolve(unique); console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeee');
+        })
         .then(this.updateUsersList())
-        .catch(err => reject(err));
+        .catch(err => console.log(err)
+        );
     });
   },
   addVacation: vacation => {
@@ -80,8 +99,8 @@ module.exports = {
         .query(insertCMD)
         .then((results) => {
           console.log(results);
-          
-          resolve(results)})
+          resolve(results)
+        })
         .catch(err => console.log(err)
         );
     });
@@ -102,24 +121,27 @@ module.exports = {
     });
   },
   deleteVacation: id => {
-    const insertCMD = `DELETE FROM vacations WHERE id = ${id}`;
+    const deleteCMD = `DELETE FROM vacations WHERE id = ${id}`;
     return new Promise((resolve, reject) => {
       pool
-        .query(insertCMD)
-        .then(resolve())
+        .query(deleteCMD)
+        .then(results => {
+          resolve(results);
+          // emitVacs();
+        })
         .catch(err => reject(err));
     });
   },
   login: user => {
     return new Promise((resolve, reject) => {
-      const getPassCMD = `SELECT password, token FROM users WHERE username = '${
+      const getPassCMD = `SELECT password, id,  token FROM users WHERE username = '${
         user.user
         }'`;
       pool.query(getPassCMD).then(results => {
         if (results.length > 0)
           bcrypt.compare(user.password, results[0].password, (err, same) => {
             if (err) throw err;
-            same ? resolve(results[0].token) : reject("bad1");
+            same ? resolve(results[0]) : reject("bad1");
           });
         else reject("bad2");
       });
@@ -153,12 +175,13 @@ module.exports = {
   checkUsername: function (username) {
     return usersList.includes(username);
   },
-  follow: (token, vacationArr) => {
-    if (typeof token !== "undefined" || token === 'undefined') {
-      const updateFollowCMD = `UPDATE users set follows = ${vacationArr} WHERE token = '${token}'`;
-      const updateVacationCMD = `UPDATE vacations set followers = followers + 1 WHERE id = ${vacationID}`
-      pool.query(updateFollowCMD).then(pool.query(updateVacationCMD));
-    }
+  follow: (token, userID, vacationID) => {
+    return new Promise((resolve, reject) => {
+      if (typeof token !== "undefined" || token === 'undefined') {
+        const updatefollowersCMD = `INSERT INTO followers(vacationID, userID) VALUES(${vacationID}, ${userID})`;
+        pool.query(updatefollowersCMD).then(res => { resolve(res) });
+      }
+    })
   },
   checkIfAdmin: (token) => {
     if (typeof token !== 'undefined') {

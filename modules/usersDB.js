@@ -4,6 +4,7 @@ const uniqueString = require("unique-string");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
+
 module.exports = {
     addUser: function (user) {
         return new Promise((resolve, reject) => {
@@ -16,9 +17,11 @@ module.exports = {
           }','${user.firstName}','${user.lastName}','${hash}', '${unique}', ${user.isAdmin ? "b'1'" : "b'0'"})`;
                     return pool.query(insertCMD);
                 })
-                .then(resolve(unique))
+                .then(() => {console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
+                 resolve(unique)})
                 .then(this.updateUsersList())
-                .catch(err => reject(err));
+                .catch(err => console.log(err)
+                );
         });
     },
     login: user => {

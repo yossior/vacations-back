@@ -8,13 +8,19 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/login', async function (req, res, next) {
-  const token = await db.login(req.body).catch(err => err);
-  res.cookie('token', token);
+  const results = await db.login(req.body).catch(err => err);
+  res.cookie('token', results.token);
+  res.cookie('userID', results.id);
   res.send({});
 });
 
-router.post('/follow', async function (req, res, next) {
-  await db.follow(req.cookies.token, req.body.vacationArr);
+router.post('/follow/:vacID', async function (req, res, next) {
+  await db.follow(req.cookies.token, req.cookie.userID, req.params.vacID);
+  res.send('OK!');
+});
+
+router.post('/unfollow/:vacID', async function (req, res, next) {
+  await db.unfollow(req.params.userID, req.params.vacID);
   res.send('OK!');
 });
 

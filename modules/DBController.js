@@ -80,11 +80,10 @@ module.exports = {
           return pool.query(insertCMD);
         })
         .then(() => {
-          resolve(unique); console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeee');
+            this.login(user).then(results => resolve(results));
         })
         .then(this.updateUsersList())
-        .catch(err => console.log(err)
-        );
+        .catch(err => console.log(err));
     });
   },
   addVacation: vacation => {
@@ -101,8 +100,7 @@ module.exports = {
           console.log(results);
           resolve(results)
         })
-        .catch(err => console.log(err)
-        );
+        .catch(err => console.log(err));
     });
   },
   editVacation: (id, vacation) => {
@@ -135,7 +133,7 @@ module.exports = {
   login: user => {
     return new Promise((resolve, reject) => {
       const getPassCMD = `SELECT password, id,  token FROM users WHERE username = '${
-        user.user
+        user.username
         }'`;
       pool.query(getPassCMD).then(results => {
         if (results.length > 0)
@@ -179,7 +177,9 @@ module.exports = {
     return new Promise((resolve, reject) => {
       if (typeof token !== "undefined" || token === 'undefined') {
         const updatefollowersCMD = `INSERT INTO followers(vacationID, userID) VALUES(${vacationID}, ${userID})`;
-        pool.query(updatefollowersCMD).then(res => { resolve(res) });
+        pool.query(updatefollowersCMD).then(res => {
+          resolve(res)
+        });
       }
     })
   },
@@ -196,6 +196,11 @@ module.exports = {
   },
   getAllVacations: () => {
     const getCMD = `SELECT * FROM vacations`;
+    return pool.query(getCMD);
+  },
+  getVacationsFollowing: id => {
+    const sql=`SELECT v.*, NOT ISNULL(f.userid) AS follows FROM vacations v
+         LEFT JOIN  followers f ON v.id=f.vacationid AND f.userid= ? `;
     return pool.query(getCMD);
   }
 };

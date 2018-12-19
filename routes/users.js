@@ -10,8 +10,9 @@ router.get('/', async function (req, res, next) {
 });
 
 router.post('/', async function (req, res, next) {
-  const token = await db.addUser(req.body);
-  res.cookie('token', token);
+  const results = await db.addUser(req.body);
+  res.cookie('token', results.token);
+  res.cookie('id', results.id);
   res.send();
 });
 

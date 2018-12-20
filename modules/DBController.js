@@ -199,8 +199,8 @@ module.exports = {
     return pool.query(getCMD);
   },
   getVacationsFollowing: id => {
-    const sql=`SELECT v.*, NOT ISNULL(f.userid) AS follows FROM vacations v
-         LEFT JOIN  followers f ON v.id=f.vacationid AND f.userid= ? `;
+    const getCMD=`SELECT v.*, NOT ISNULL(f.userid) AS follows FROM vacations v
+         LEFT JOIN followers f ON v.id=f.vacationid AND f.userid=${id}`;
     return pool.query(getCMD);
   }
 };

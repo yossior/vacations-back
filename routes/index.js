@@ -15,7 +15,7 @@ router.post('/login', async function (req, res, next) {
 });
 
 router.post('/follow/:vacID', async function (req, res, next) {
-  await db.follow(req.cookies.token, req.cookie.userID, req.params.vacID);
+  await db.follow(req.cookies.token, req.cookies.userID, req.params.vacID);
   res.send('OK!');
 });
 

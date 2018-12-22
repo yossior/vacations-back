@@ -21,10 +21,6 @@ const adminUser = {
 };
 
 const io = require('socket.io')();
-async function emitVacs() {
-  io.emit('VACS_UPDATE', await db.getAllVacations())
-};
-
 
 module.exports = {
   createDB() {
@@ -47,7 +43,6 @@ module.exports = {
                 price INT NULL,
                 startDate DATE NULL,
                 endDate DATE NULL,
-                followers INT NOT NULL DEFAULT 0,
                 PRIMARY KEY (id))`;
     const followers = `CREATE TABLE IF NOT EXISTS followers (
                   id INT NOT NULL AUTO_INCREMENT,

@@ -16,8 +16,8 @@ router.post('/', async function (req, res, next) {
   res.send();
 });
 
-router.post('/check', async function (req, res, next) {
-  res.send(await db.checkUsername(req.body.userName));
+router.get('/check/:username', async function (req, res, next) {
+  res.status(db.checkUsername(req.params.username) ? 409 : 200).send();
 });
 
 

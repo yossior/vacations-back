@@ -13,7 +13,7 @@ const firstConnection = mysql.createConnection({
 });
 
 const adminUser = {
-  user: 'Admin',
+  username: 'Admin',
   firstName: 'Admin',
   lastName: 'Admin',
   password: 'Admin',
@@ -62,16 +62,15 @@ module.exports = {
       })
       .then(results => {
         if (typeof results !== 'undefined' && results.warningCount === 0) this.addUser(adminUser)
-      });
+      })
+      .then(this.updateUsersList);
   },
   addUser: function (user) {
     return new Promise((resolve, reject) => {
       const unique = uniqueString();
       bcrypt.hash(user.password, saltRounds)
         .then(hash => {
-          const insertCMD = `INSERT INTO users (username, firstName, lastName, password, token, isAdmin) VALUES ('${
-            user.username
-            }','${user.firstName}','${user.lastName}','${hash}', '${unique}', ${user.isAdmin ? "b'1'" : "b'0'"})`;
+          const insertCMD = `INSERT INTO users (username, firstName, lastName, password, token, isAdmin) VALUES ('${user.username}','${user.firstName}','${user.lastName}','${hash}', '${unique}', ${user.isAdmin ? "b'1'" : "b'0'"})`;
           return pool.query(insertCMD);
         })
         .then(() => {
@@ -161,7 +160,7 @@ module.exports = {
     pool.query(getPassCMD).then(results => {
       usersList = [];
       for (user of results) {
-        usersList.push(user.user);
+        usersList.push(user.username);
       }
     });
   },
@@ -172,6 +171,19 @@ module.exports = {
     return new Promise((resolve, reject) => {
       if (typeof token !== "undefined" || token === 'undefined') {
         const updatefollowersCMD = `INSERT INTO followers(vacationID, userID) VALUES(${vacationID}, ${userID})`;
+        pool.query(updatefollowersCMD).then(res => {
+          resolve(res)
+        });
+      }
+    })
+  },
+  getIDByToken(token){
+    return pool.query(`SELECT id FROM users WHERE token = ${token}`)
+  },
+  unfollow: (token, userID, vacationID) => {
+    return new Promise((resolve, reject) => {
+      if (typeof token !== "undefined" || token === 'undefined') {
+        const updatefollowersCMD = `DELETE from followers WHERE userID = ${userID} AND vacationID = ${vacationID}`;
         pool.query(updatefollowersCMD).then(res => {
           resolve(res)
         });

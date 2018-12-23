@@ -20,7 +20,7 @@ router.post('/follow/:vacID', async function (req, res, next) {
 });
 
 router.post('/unfollow/:vacID', async function (req, res, next) {
-  await db.unfollow(req.params.userID, req.params.vacID);
+  await db.unfollow(req.cookies.token, req.cookies.userID, req.params.vacID);
   res.send('OK!');
 });
 

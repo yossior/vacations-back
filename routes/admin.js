@@ -4,12 +4,17 @@ const db = require("../modules/DBController");
 const io = require('socket.io')();
 io.listen(3008);
 
-async function emitVacs() {
-  io.emit('VACS_UPDATE', await db.getAllVacations())
+function emitVacs() {
+  io.emit('VACS_UPDATE');
+  
 }
 
 router.get("/",async function (req, res, next) {
   res.send(await db.getAllVacations());
+});
+
+router.get("/statistics",async function (req, res, next) {
+  res.send(await db.getStatistics());
 });
 
 router.post("/", async function (req, res, next) {

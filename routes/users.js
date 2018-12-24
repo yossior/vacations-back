@@ -12,14 +12,11 @@ router.get('/', async function (req, res, next) {
 router.post('/', async function (req, res, next) {
   const results = await db.addUser(req.body);
   res.cookie('token', results.token);
-  res.cookie('id', results.id);
+  res.cookie('userID', results.id);
   res.send();
 });
 
 router.get('/check/:username', async function (req, res, next) {
   res.status(db.checkUsername(req.params.username) ? 409 : 200).send();
 });
-
-
-
 module.exports = router;

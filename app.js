@@ -9,7 +9,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUploader = require('express-fileupload');
 
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const vacationsRouter = require('./routes/vacations');

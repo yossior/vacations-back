@@ -74,7 +74,7 @@ module.exports = {
           return pool.query(insertCMD);
         })
         .then(() => {
-            this.login(user).then(results => resolve(results));
+          this.login(user).then(results => resolve(results));
         })
         .then(this.updateUsersList())
         .catch(err => console.log(err));
@@ -177,7 +177,7 @@ module.exports = {
       }
     })
   },
-  getIDByToken(token){
+  getIDByToken(token) {
     return pool.query(`SELECT id FROM users WHERE token = ${token}`)
   },
   unfollow: (token, userID, vacationID) => {
@@ -206,8 +206,16 @@ module.exports = {
     return pool.query(getCMD);
   },
   getVacationsFollowing: id => {
-    const getCMD=`SELECT v.*, NOT ISNULL(f.userid) AS follows FROM vacations v
+    const getCMD = `SELECT v.*, NOT ISNULL(f.userid) AS follows FROM vacations v
          LEFT JOIN followers f ON v.id=f.vacationid AND f.userid=${id}`;
     return pool.query(getCMD);
+  },
+  getStatistics: () => {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT COUNT(*) AS followers, f.vacationID,
+         v.location FROM vacations.followers f JOIN 
+         vacations.vacations v ON f.vacationID = v.id GROUP BY vacationID`;
+      pool.query(sql).then(results => resolve(results));
+    })
   }
 };
